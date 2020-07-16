@@ -84,7 +84,6 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
     public int WindowTop { get; set; }
 
 
-
     [JsonIgnore]
     public bool IsChanged { get; set; }
 

@@ -127,7 +127,7 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
       }
 
       // Add image content
-      List<string> selImageUrls = HtmlEx.ParseImageUrls(range.htmlText, $"https://{activeTab._language}.{activeTab._tabType}.org");
+      List<string> selImageUrls = HtmlEx.GetImageUrls(range.htmlText);
       if (selImageUrls.Count > 0)
       {
         WebClient wc = new WebClient();
@@ -258,6 +258,7 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
         }
       }
 
+    // TODO: Create a resusable extract w/ priority window
       private async void CreateSMExtractWithPriority()
       {
 
@@ -276,24 +277,6 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
           return;
         }
 
-        var result = await Forge.Forms.Show.Window()
-                                           .For(new Prompt<double>
-                                           {
-                                             Title = "Extract Priority?",
-                                             Value = Config.SMExtractPriority
-                                           });
-        if (!result.Model.Confirmed)
-        {
-          return;
-        }
-
-        if (result.Model.Value < 0 || result.Model.Value > 100)
-        {
-          PopupWdwHelpers.OpenAlertWdw("Priority must be between 0 and 100.", "Invalid Priority Value");
-          return;
-        }
-
-        CreateSMExtract(result.Model.Value);
       }
 
       private void BtnSMPriorityExtract_Click(object sender, RoutedEventArgs e)
@@ -369,12 +352,12 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
         // ctrl + w
         if (e.KeyPressedCode == 23)
         {
-          await SearchWikipedia();
+          //await SearchWikipedia();
         }
         // ctrl d
         else if (e.KeyPressedCode == 4)
         {
-          await SearchWiktionary();
+          //await SearchWiktionary();
         }
         // Escape
         else if (e.KeyPressedCode == 27)

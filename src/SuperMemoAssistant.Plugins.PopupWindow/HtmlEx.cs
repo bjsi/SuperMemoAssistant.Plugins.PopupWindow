@@ -24,8 +24,36 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
     }
 
-    public static string[] GetImageUrls()
+    // TODO: Need to convert relative to absolute?
+    public static List<string> GetImageUrls(string html)
     {
+
+      var imageUrls = new List<string>();
+
+      if (html.IsNullOrEmpty())
+        return imageUrls;
+
+      var doc = new HtmlDocument();
+      doc.LoadHtml(html);
+
+      var imageNodes = doc.DocumentNode.SelectNodes("//img[@src]");
+      if (imageNodes.IsNull() || imageNodes.Count == 0)
+        return imageUrls;
+
+      foreach (var imageNode in imageNodes)
+      {
+
+        string url = imageNode.GetAttributeValue("src", null);
+        if (url.IsNullOrEmpty() || !Uri.IsWellFormedUriString(url, UriKind.Absolute))
+          continue;
+
+        // Convert relative links to absolute
+        // url = WikiUrlUtils.ConvRelToAbsLink(baseUrl, url);
+
+        imageUrls.Add(url);
+      }
+
+      return imageUrls;
 
     }
 
