@@ -1,4 +1,5 @@
-﻿using SuperMemoAssistant.Extensions;
+﻿using mshtml;
+using SuperMemoAssistant.Extensions;
 using SuperMemoAssistant.Plugins.PopupWindow.Interop;
 using SuperMemoAssistant.Sys.Remoting;
 using System;
@@ -82,14 +83,11 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
     public IHTMLTxtRange GetPopupWikiWdwSelRange()
     {
       // Gets called by the parent popupwikiwindow to get the selected range of the active tab.
-      var htmlDoc = (((PopupWikiBrowser)this.Content).webBrowser.Document.DomDocument as IHTMLDocument2);
+      var htmlDoc = (((Browser)this.Content).webBrowser.Document.DomDocument as IHTMLDocument2);
       IHTMLSelectionObject selection = htmlDoc.selection;
       IHTMLTxtRange range = (IHTMLTxtRange)selection.createRange();
       return range;
     }
-
-
-
 
     private void TabCloseBtnClick()
     {
