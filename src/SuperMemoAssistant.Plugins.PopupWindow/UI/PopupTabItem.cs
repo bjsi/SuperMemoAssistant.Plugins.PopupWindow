@@ -25,7 +25,7 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
     public PopupTabItem(BrowserContent content, PopupBrowserWdw parent)
     {
 
-      if (content.IsNull() || content.html.IsNullOrEmpty() || parent.IsNull())
+      if (content.IsNull() || content.Html.IsNullOrEmpty() || parent.IsNull())
         return;
 
       this.BrowserContent = content;
@@ -33,13 +33,13 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
       this.parentWdw = parent;
 
       this.Content = new Browser();
-      ((Browser)this.Content).webBrowser.DocumentText = content.html;
+      ((Browser)this.Content).webBrowser.DocumentText = content.Html;
       ((Browser)this.Content).webBrowser.DocumentCompleted += WebBrowser_DocumentCompleted;
 
       var header = new TabItemHeader();
-      if (!content.icon.IsNullOrEmpty())
-        header.TabHeaderImage.Source = new BitmapImage(new Uri(content.icon));
-      header.TabTitle.Content = content.references.Title;
+      if (!content.Icon.IsNullOrEmpty())
+        header.TabHeaderImage.Source = new BitmapImage(new Uri(content.Icon));
+      header.TabTitle.Content = content.References.Title;
       this.Header = header;
       // header.CloseBtn.Clickl
 

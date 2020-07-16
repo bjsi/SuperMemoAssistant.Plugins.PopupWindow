@@ -24,10 +24,16 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
         return false;
 
       return Svc<PopupWindowPlugin>.Plugin.RegisterPopupWindowProvider(name, urlRegexes, provider);
+
     }
 
-    public bool Open(string url)
+    public async Task<bool> Open(string url)
     {
+
+      if (url.IsNullOrEmpty())
+        return false;
+
+      return await Svc<PopupWindowPlugin>.Plugin.Open(url);
 
     }
   }

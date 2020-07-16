@@ -36,12 +36,17 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
   using System.Diagnostics.CodeAnalysis;
   using System.Linq;
   using System.Text.RegularExpressions;
+  using System.Threading.Tasks;
+  using System.Windows;
+  using SuperMemoAssistant.Extensions;
   using SuperMemoAssistant.Plugins.PopupWindow.Interop;
   using SuperMemoAssistant.Plugins.PopupWindow.Models;
+  using SuperMemoAssistant.Plugins.PopupWindow.UI;
   using SuperMemoAssistant.Services;
   using SuperMemoAssistant.Services.IO.HotKeys;
   using SuperMemoAssistant.Services.Sentry;
   using SuperMemoAssistant.Services.UI.Configuration;
+  using SuperMemoAssistant.Sys.Remoting;
 
   // ReSharper disable once UnusedMember.Global
   // ReSharper disable once ClassNeverInstantiated.Global
@@ -66,6 +71,8 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
     public PopupWindowCfg Config;
 
     private PopupWindowSvc _popupWindowSvc = new PopupWindowSvc();
+
+    private PopupBrowserWdw CurrentWindow { get; set; }
 
     #endregion
 
@@ -111,7 +118,7 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
     }
 
-    public bool Open(string url)
+    public async Task<bool> Open(string url)
     {
 
       // Find content provider
@@ -126,16 +133,42 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
         
         var info = kvpair.Value;
         var regexes = info.urlRegexes;
-        if (regexes.Any(r => new Regex(r).Match(url).Success))
-        {
-          // fetch html
+        var provider = info.provider;
 
-          break;
+        if (!regexes.Any(r => new Regex(r).Match(url).Success))
+          continue;
+
+        // fetch html
+        BrowserContent content = await provider.FetchHtml(url);
+
+        // Open tab / window
+        if (!CurrentWindow.IsNull() && !CurrentWindow.IsClosed)
+        {
+          CurrentWindow.Open(content);
+        }
+        else
+        {
+          OpenNewPopupBrowser(content);
         }
 
+        return true;
       }
 
-      // Get Html
+      return false;
+
+    }
+
+    private void OpenNewPopupBrowser(BrowserContent content)
+    {
+      
+      if (content.IsNull() || content.Html.IsNullOrEmpty())
+        return;
+
+      Application.Current.Dispatcher.Invoke(() =>
+      {
+        var wdw = new PopupBrowserWdw(content);
+        wdw.ShowAndActivate();
+      });
 
     }
 
