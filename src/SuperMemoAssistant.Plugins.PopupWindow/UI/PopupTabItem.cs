@@ -17,10 +17,9 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
   {
 
     public BrowserContent BrowserContent { get; set; }
-    public IContentProvider provider { get; set; }
+    public IBrowserContentProvider provider { get; set; }
     public string url { get; set; }
     private PopupBrowserWdw parentWdw;
-
 
     public PopupTabItem(BrowserContent content, PopupBrowserWdw parent)
     {

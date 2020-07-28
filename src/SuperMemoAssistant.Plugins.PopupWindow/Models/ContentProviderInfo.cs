@@ -9,12 +9,16 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.Models
 {
   public class ContentProviderInfo
   {
-    public List<string> urlRegexes { get; set; }
-    public IContentProvider provider { get; set; }
-    public ContentProviderInfo(List<string> urlRegexes, IContentProvider provider)
+
+    public string[] urlRegexes { get; set; }
+    public IBrowserContentProvider provider { get; set; }
+
+    public ContentProviderInfo(string[] urlRegexes, IBrowserContentProvider provider)
     {
+
       this.provider = provider;
       this.urlRegexes = urlRegexes;
+      
     }
   }
 }

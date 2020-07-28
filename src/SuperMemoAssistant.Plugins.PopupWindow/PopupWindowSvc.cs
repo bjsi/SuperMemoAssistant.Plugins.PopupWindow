@@ -1,6 +1,7 @@
 ﻿using PluginManager.Interop.Sys;
 using SuperMemoAssistant.Plugins.PopupWindow.Interop;
 using SuperMemoAssistant.Services;
+using SuperMemoAssistant.Sys.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 {
   class PopupWindowSvc : PerpetualMarshalByRefObject, IPopupWindowSvc
   {
-    public bool RegisterPopupWindowProvider(string name, List<string> urlRegexes, IContentProvider provider)
+
+    public bool RegisterPopupWindowProvider(string name, string[] urlRegexes, IBrowserContentProvider provider)
     {
 
       if (name.IsNullOrEmpty())
@@ -27,13 +29,10 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
     }
 
-    public async Task<bool> Open(string url)
+    public RemoteTask<bool> Open(string url, ContentType type)
     {
 
-      if (url.IsNullOrEmpty())
-        return false;
-
-      return await Svc<PopupWindowPlugin>.Plugin.Open(url);
+      return Svc<PopupWindowPlugin>.Plugin.Open(url, type);
 
     }
   }

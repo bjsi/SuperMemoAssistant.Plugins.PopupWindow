@@ -57,7 +57,14 @@ namespace SuperMemoAssistant.Plugins.PopupWindow.UI
       Closed += (sender, args) => IsClosed = true;
     }
 
-    public void AddTab(PopupTabItem newTab)
+    public void Open(BrowserContent content)
+    {
+      // Create new tab
+      PopupTabItem newTab = new PopupTabItem(content, this);
+      AddTab(newTab);
+    }
+
+    private void AddTab(PopupTabItem newTab)
     {
       if (newTab != null)
       {

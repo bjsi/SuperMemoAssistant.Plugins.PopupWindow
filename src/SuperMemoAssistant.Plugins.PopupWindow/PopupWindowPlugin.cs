@@ -67,11 +67,22 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
     /// <inheritdoc />
     public override bool HasSettings => true;
-    public Dictionary<string, ContentProviderInfo> ContentProviders { get; set; } = new Dictionary<string, ContentProviderInfo>();
+
     public PopupWindowCfg Config;
 
+    /// <summary>
+    /// Stores content provider information
+    /// </summary>
+    public Dictionary<string, ContentProviderInfo> ContentProviders { get; set; } = new Dictionary<string, ContentProviderInfo>();
+
+    /// <summary>
+    /// Published service that content providers can subscribe with.
+    /// </summary>
     private PopupWindowSvc _popupWindowSvc = new PopupWindowSvc();
 
+    /// <summary>
+    /// The current window.
+    /// </summary>
     private PopupBrowserWdw CurrentWindow { get; set; }
 
     #endregion
@@ -95,10 +106,13 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
       LoadConfig();
 
+      // Hotkeys
+
       PublishService<IPopupWindowSvc, PopupWindowSvc>(_popupWindowSvc);
+
     }
 
-    public bool RegisterPopupWindowProvider(string name, List<string> urlRegexes, IContentProvider provider)
+    public bool RegisterPopupWindowProvider(string name, string[] urlRegexes, IBrowserContentProvider provider)
     {
 
       if (string.IsNullOrEmpty(name))
@@ -118,11 +132,11 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
     }
 
-    public async Task<bool> Open(string url)
+    public async Task<bool> Open(string query, ContentType type)
     {
 
       // Find content provider
-      if (url.IsNullOrEmpty())
+      if (query.IsNullOrEmpty())
         return false;
 
       if (ContentProviders.IsNull() || !ContentProviders.Any())
@@ -135,21 +149,18 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
         var regexes = info.urlRegexes;
         var provider = info.provider;
 
-        if (!regexes.Any(r => new Regex(r).Match(url).Success))
+        if (!regexes.Any(r => new Regex(r).Match(query).Success))
           continue;
 
-        // fetch html
-        BrowserContent content = await provider.FetchHtml(url);
+        var content = type == ContentType.Article
+          ? await provider.FetchArticleHtml(query)
+          : await provider.Search(query);
 
         // Open tab / window
         if (!CurrentWindow.IsNull() && !CurrentWindow.IsClosed)
-        {
           CurrentWindow.Open(content);
-        }
         else
-        {
           OpenNewPopupBrowser(content);
-        }
 
         return true;
       }
@@ -157,6 +168,7 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
       return false;
 
     }
+
 
     private void OpenNewPopupBrowser(BrowserContent content)
     {
