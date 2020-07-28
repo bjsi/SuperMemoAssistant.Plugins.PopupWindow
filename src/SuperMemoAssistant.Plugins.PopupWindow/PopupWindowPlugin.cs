@@ -38,6 +38,7 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
   using System.Text.RegularExpressions;
   using System.Threading.Tasks;
   using System.Windows;
+  using Anotar.Serilog;
   using SuperMemoAssistant.Extensions;
   using SuperMemoAssistant.Plugins.PopupWindow.Interop;
   using SuperMemoAssistant.Plugins.PopupWindow.Models;
@@ -106,8 +107,6 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
 
       LoadConfig();
 
-      // Hotkeys
-
       PublishService<IPopupWindowSvc, PopupWindowSvc>(_popupWindowSvc);
 
     }
@@ -116,16 +115,36 @@ namespace SuperMemoAssistant.Plugins.PopupWindow
     {
 
       if (string.IsNullOrEmpty(name))
+      {
+
+        LogTo.Warning("Failed to register provider because name is null or empty");
         return false;
 
-      if (provider == null)
+      }
+
+      if (provider.IsNull())
+      {
+
+        LogTo.Warning("Failed to register provider because provider is null");
         return false;
+
+      }
 
       if (urlRegexes.IsNull() || !urlRegexes.Any())
+      {
+
+        LogTo.Warning("Failed to register provider because urlRegex array is null or empty");
         return false;
 
+      }
+
       if (ContentProviders.ContainsKey(name))
+      {
+
+        LogTo.Warning($"Failed to register provider because a provider with name {name} is already registered");
         return false;
+
+      }
 
       ContentProviders[name] = new ContentProviderInfo(urlRegexes, provider);
       return true;
